@@ -5,7 +5,6 @@ import {
   ScrollView,
   View,
   TouchableOpacity,
-  Button,
   Text,
   KeyboardAvoidingView,
   Platform,
@@ -239,10 +238,6 @@ const styles = StyleSheet.create({
   activeButtonStyle: {
     color: 'white',
   },
-  //   disActiveButtonStyle: {
-  //     backgroundColor: 'white',
-  //     color: 'black',
-  //   },
   sectionTitle: {
     marginTop: 16,
     fontSize: 16,
