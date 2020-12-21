@@ -31,9 +31,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '400',
     color: Colors.black,
-    flex: 2,
-    height: 32,
-    lineHeight: 32,
+    flex: 3,
+    height: 40,
+    lineHeight: 40,
   },
   flexContainer: {
     display: 'flex',

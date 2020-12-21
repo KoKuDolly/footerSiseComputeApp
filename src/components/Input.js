@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderWidth: 1,
     borderRadius: 4,
-    height: 30,
+    height: 38,
   },
 });
 export {Input};

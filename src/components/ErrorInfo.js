@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   flexItem: {
-    flex: 2,
+    flex: 3,
   },
 });
 export {ErrorInfo};

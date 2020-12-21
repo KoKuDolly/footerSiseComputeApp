@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import {Picker} from '@react-native-picker/picker';
 import {useForm} from 'react-hook-form';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import Header from '../components/Header';
@@ -24,13 +25,16 @@ const App = () => {
   const [abcd, setabcd] = useState(0);
   const [s1, sets1] = useState(0);
   const [s2, sets2] = useState(0);
-  const handleChangeModelType = (model) => {
-    changeModelType(model);
+  const [selectedValue, changeSelectedValue] = useState('left');
+
+  const handlePickerChange = (itemValue) => {
+    changeSelectedValue(itemValue);
+
     trigger().then((res) => {
       if (res) {
         const value = getValues();
-        const {AB, AD, BD, BC, CD} = value;
-        if (model === 'left') {
+        const {AB, AD, BD} = value;
+        if (itemValue === 'left') {
           const s = 131.959 + +AB * 2.384 + +AD * 0.572 + +BD * 2.466;
           // CD值默认按照最优模型L1计算
           const cd = (s - 132.216) / 3.125;
@@ -39,6 +43,37 @@ const App = () => {
             (s - (113.179 + +AB * 1.307 + +AD * 1.448 + cd * 2.349)) / 0.385;
           setValue('CD', `${cd}`);
           setValue('BC', bc + '');
+        }
+        if (itemValue === 'right') {
+          const s = 129.012 + +AB * 2.269 + +AD * 0.504 + +BD * 2.916;
+          // CD值默认按照最优模型L1计算
+          const cd = (s - 133.107) / 3.03;
+          // BC值默认按照最优模型SABCD计算
+          const bc =
+            (s - (116.592 + +AB * 1.181 + +AD * 1.069 + cd * 1.389)) / 1.297;
+          setValue('CD', `${cd}`);
+          setValue('BC', bc + '');
+        }
+        if (itemValue === 'average') {
+          const s = 125.455 + +AB * 2.595 + +AD * 0.63 + +BD * 2.969;
+          // CD值默认按照最优模型L1计算
+          const cd = (s - 124.328) / 3.702;
+          // BC值默认按照最优模型SABCD计算
+          const bc =
+            (s - (109.404 + +AB * 1.204 + +AD * 1.405 + cd * 2.572)) / 0.494;
+          setValue('CD', `${cd}`);
+          setValue('BC', bc + '');
+        }
+      }
+    });
+  };
+  const handleChangeModelType = (model) => {
+    changeModelType(model);
+    trigger().then((res) => {
+      if (res) {
+        const value = getValues();
+        const {AB, AD, BD, BC, CD} = value;
+        if (model === 'left') {
           setsabd(131.959 + +AB * 2.384 + +AD * 0.572 + +BD * 2.466);
           setsbcd(119.283 + +BD * 1.842 + +BC * 0.031 + +CD * 2.741);
           setabcd(
@@ -48,14 +83,6 @@ const App = () => {
           sets2(113.777 + +CD * 2.814 + +AD * 1.932);
         }
         if (model === 'right') {
-          const s = 129.012 + +AB * 2.269 + +AD * 0.504 + +BD * 2.916;
-          // CD值默认按照最优模型L1计算
-          const cd = (s - 133.107) / 3.03;
-          // BC值默认按照最优模型SABCD计算
-          const bc =
-            (s - (116.592 + +AB * 1.181 + +AD * 1.069 + cd * 1.389)) / 1.297;
-          setValue('CD', cd + '');
-          setValue('BC', bc + '');
           setsabd(129.012 + +AB * 2.269 + +AD * 0.504 + +BD * 2.916);
           setsbcd(118.395 + +BD * 1.655 + +BC * 0.962 + +CD * 1.831);
           setabcd(
@@ -65,14 +92,6 @@ const App = () => {
           sets2(117.789 + +CD * 2.484 + +AD * 1.949);
         }
         if (model === 'average') {
-          const s = 125.455 + +AB * 2.595 + +AD * 0.63 + +BD * 2.969;
-          // CD值默认按照最优模型L1计算
-          const cd = (s - 124.328) / 3.702;
-          // BC值默认按照最优模型SABCD计算
-          const bc =
-            (s - (109.404 + +AB * 1.204 + +AD * 1.405 + cd * 2.572)) / 0.494;
-          setValue('CD', cd + '');
-          setValue('BC', bc + '');
           setsabd(125.455 + +AB * 2.595 + +AD * 0.63 + +BD * 2.969);
           setsbcd(112.658 + +BD * 1.842 + +BC * 0.191 + +CD * 3.038);
           setabcd(
@@ -123,6 +142,17 @@ const App = () => {
                   errors={errors}
                   required={true}
                 />
+              </View>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={selectedValue}
+                  onValueChange={(itemValue) => handlePickerChange(itemValue)}>
+                  <Picker.Item label="左足推算的BC与CD" value="left" />
+                  <Picker.Item label="右足推算的BC与CD" value="right" />
+                  <Picker.Item label="左右足推算的BC与CD" value="average" />
+                </Picker>
+              </View>
+              <View style={styles.sectionContainer}>
                 <InputItem
                   name="BC"
                   control={control}
@@ -151,7 +181,9 @@ const App = () => {
                   onPress={() => handleChangeModelType('left')}>
                   <Text
                     style={
-                      modelType === 'left' ? styles.activeButtonStyle : ''
+                      modelType === 'left'
+                        ? styles.activeButtonStyle
+                        : styles.disactiveButtonStyle
                     }>
                     左足估算
                   </Text>
@@ -169,7 +201,9 @@ const App = () => {
                   onPress={() => handleChangeModelType('right')}>
                   <Text
                     style={
-                      modelType === 'right' ? styles.activeButtonStyle : ''
+                      modelType === 'right'
+                        ? styles.activeButtonStyle
+                        : styles.disactiveButtonStyle
                     }>
                     右足估算
                   </Text>
@@ -187,7 +221,9 @@ const App = () => {
                   onPress={() => handleChangeModelType('average')}>
                   <Text
                     style={
-                      modelType === 'average' ? styles.activeButtonStyle : ''
+                      modelType === 'average'
+                        ? styles.activeButtonStyle
+                        : styles.disactiveButtonStyle
                     }>
                     左右足估算
                   </Text>
@@ -218,6 +254,8 @@ const styles = StyleSheet.create({
   },
   body: {
     backgroundColor: Colors.white,
+    display: 'flex',
+    flexDirection: 'column',
   },
   sectionContainer: {
     marginTop: 16,
@@ -238,10 +276,16 @@ const styles = StyleSheet.create({
   activeButtonStyle: {
     color: 'white',
   },
+  disactiveButtonStyle: {
+    color: 'black',
+  },
   sectionTitle: {
     marginTop: 16,
     fontSize: 16,
     paddingLeft: 10,
+  },
+  pickerContainer: {
+    paddingHorizontal: 24,
   },
 });
 
