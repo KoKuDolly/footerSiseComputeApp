@@ -68,6 +68,7 @@ const App = () => {
     });
   };
   const handleChangeModelType = (model) => {
+    console.log(model);
     changeModelType(model);
     trigger().then((res) => {
       if (res) {
